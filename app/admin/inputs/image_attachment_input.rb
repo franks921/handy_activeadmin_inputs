@@ -1,5 +1,5 @@
 # Use with ActiveAdmin, CarrierWave and Formtastic
-# f.input :cover, as: :attachment, version: :small, hint: 'Recommened 400x400 pixels. JPG, PNG'
+# f.input :cover, as: :image_attachment, version: :small, hint: 'Recommened 400x400 pixels. JPG, PNG'
 
 class ImageAttachmentInput < Formtastic::Inputs::FileInput
 
