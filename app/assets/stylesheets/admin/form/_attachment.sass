@@ -1,23 +1,81 @@
-.image-attachment.input
+$attachment-preview-size: 80px
+
+.attachment.input
   overflow: hidden
   position: relative
 
   a
     display: block
-    transform: box-shadow 150ms ease-in-out
+    float: left
+    margin-right: 10px
+    position: relative
+    text-decoration: none
+    transition: box-shadow 150ms ease-in-out
+    
     &:hover
       .attachment-input__image
         box-shadow: 0 0 2px #333
+        
+    span.file-size,
+    span.content-type
+      background: rgba(#FFF, 0.9)
+      bottom: 3px
+      color: #333
+      display: block
+      font-size: 9px
+      font-weight: 700
+      left: 0
+      line-height: normal
+      padding: 1px 3px
+      position: absolute
+      text-align: center
+      width: 100%
+      z-index: 2
+      
+    span.content-type
+      bottom: auto
+      left: auto
+      right: 3px
+      top: 3px
+      width: auto
+      
+    i, img
+      +size($attachment-preview-size)
+      border: 3px solid #FFF
+      box-shadow: 0 0 1px #333
+      color: #333
+      display: block
+      text-align: center
+    
+    i
+      font-size: 1rem
+      line-height: $attachment-preview-size - 14
+      
+      &:before
+        content: '\f0f6'
+
+    .fa-ct-pdf
+      @extend .fa-file-pdf-o
+
+    .fa-ct-bmp,
+    .fa-ct-gif,
+    .fa-ct-jpeg,
+    .fa-ct-jpg,
+    .fa-ct-png
+      @extend .fa-file-image-o
+
+    .fa-ct-mp4,
+    .fa-ct-3gp,
+    .fa-ct-ogv,
+    .fa-ct-ogg
+      @extend .fa-file-video-o
+
+.attachment.input a.attachment-input__document i
+  height: $attachment-preview-size - 16
+  width: $attachment-preview-size - 16
+  line-height: $attachment-preview-size - 16 - 10
 
 .attachment-input
-
-  &__image
-    +size(64px)
-    border: 3px solid #FFF
-    box-shadow: 0 0 1px #333
-    display: block
-    float: left
-    margin-right: 10px
 
   &__remove
     color: red
