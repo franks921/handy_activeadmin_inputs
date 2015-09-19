@@ -1,9 +1,5 @@
 class AttachmentInput < Formtastic::Inputs::FileInput
 
-  def image_html_options
-    {class: 'attachment-input__image', alt: nil}.merge(options[:image_html] || {})
-  end
-
   def to_html
     input_wrapping do
       [
@@ -17,44 +13,53 @@ class AttachmentInput < Formtastic::Inputs::FileInput
 
   protected
 
-    def attachment_image
+    def attachment_file
       builder.object.send(method)
+    end
+    
+    def attachment_content_type
+      MIME::Types[attachment_file.content_type].first.extensions.first
     end
 
     def attachment_present?
-      attachment_image.present?
+      attachment_file.present?
     end
 
     def remove_attachment_html
       return if !attachment_present?
       
-      for_id = "#{@object.class.to_s.underscore}_remove_#{method}"
-      
-      builder.template.content_tag(:label, for: for_id, class: 'attachment-input__remove') do
-        [builder.check_box("remove_#{method}", {}, 1, 0), 'Unlink attachment?'].join.html_safe
+      builder.template.content_tag(:label, for: "#{@object.class.to_s.underscore}_remove_#{method}", class: 'attachment-input__remove') do
+        [builder.check_box("remove_#{method}", {}, 1, 0), 'Remove attachment?'].join.html_safe
       end
     end
     
     def preview_html
       return if builder.object.new_record? || !attachment_present?
       
-      original     = attachment_image
-      thumb        = original.url(options[:cw_version])
-      content_type = MIME::Types[original.content_type].first.extensions.first
-      css          = "attachment-input__#{options.has_key?(:cw_version) ? 'image' : 'document'}"
+      link_options = {
+        target: '_blank',
+        class: "attachment-input__#{options.has_key?(:cw_version) ? 'image' : 'document'}"
+      }
       
-      builder.template.link_to(original.url, target: '_blank', class: css) do
-        html = [
-          builder.template.content_tag(:span, content_type.upcase, class: 'content-type'),
-          builder.template.content_tag(:span, template.number_to_human_size(attachment_image.size.to_s.downcase), class: 'file-size')
-        ]
-        if options.has_key?(:cw_version)
-          html << builder.template.image_tag(thumb, image_html_options)
-        else
-          html << builder.template.content_tag(:i, nil, class: "fa fa-ct-#{content_type}")
-        end
-        html.join.html_safe
+      builder.template.link_to(attachment_file.url, link_options) do
+        [attachment_content_type_html, attachment_size_html, attachment_icon_html].join.html_safe
       end
+    end
+
+    def attachment_icon_html
+      if options.has_key?(:cw_version)
+        builder.template.image_tag(attachment_file.url(options[:cw_version]), {class: 'attachment-input__image', alt: nil})
+      else
+        builder.template.content_tag(:i, nil, class: "fa fa-ct-#{attachment_content_type}")
+      end
+    end
+
+    def attachment_content_type_html
+      builder.template.content_tag(:span, attachment_content_type.upcase, class: 'content-type')
+    end
+
+    def attachment_size_html
+      builder.template.content_tag(:span, template.number_to_human_size(attachment_file.size.to_s.downcase), class: 'file-size')
     end
 
 end
